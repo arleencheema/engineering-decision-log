@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
@@ -22,6 +23,10 @@ interface PageProps {
 async function updateDecision(id: string, formData: FormData) {
   "use server";
 
+  const { auth } = await import('@clerk/nextjs/server')
+  const { userId } = await auth()
+  if (!userId) throw new Error('Not authenticated')
+
   const raw = (key: string) => (formData.get(key) as string | null) ?? "";
   const splitLines = (key: string): string[] =>
     raw(key)
@@ -43,7 +48,8 @@ async function updateDecision(id: string, formData: FormData) {
   const { error } = await supabase
     .from("decisions")
     .update(updates)
-    .eq("id", id);
+    .eq("id", id)
+    .eq("user_id", userId);
 
   if (error) throw new Error(error.message);
 
@@ -89,11 +95,14 @@ function Field({
 
 export default async function EditDecisionPage({ params }: PageProps) {
   const { id } = await params;
+  const { userId } = await auth();
+  if (!userId) return notFound();
 
   const { data, error } = await supabase
     .from("decisions")
     .select("*")
     .eq("id", id)
+    .eq("user_id", userId)
     .single();
 
   if (error || !data) {
@@ -109,8 +118,6 @@ export default async function EditDecisionPage({ params }: PageProps) {
       style={{ backgroundColor: "#F5F0E8", fontFamily: "var(--font-inter)" }}
     >
       <div className="max-w-3xl mx-auto px-6 py-16 md:py-24">
-
-        {/* Nav */}
         <nav className="flex items-center justify-between mb-16">
           <Link
             href={`/decisions/${id}`}
@@ -127,21 +134,13 @@ export default async function EditDecisionPage({ params }: PageProps) {
           </span>
         </nav>
 
-        {/* Page title */}
         <header className="mb-12 pb-12 border-b" style={{ borderColor: "#D6CFC4" }}>
-          <p
-            className="text-xs tracking-[0.2em] uppercase mb-3"
-            style={{ color: "#8C7B6B" }}
-          >
+          <p className="text-xs tracking-[0.2em] uppercase mb-3" style={{ color: "#8C7B6B" }}>
             {d.project}
           </p>
           <h1
             className="text-4xl md:text-5xl leading-tight"
-            style={{
-              fontFamily: "var(--font-playfair)",
-              color: "#1A1A1A",
-              fontWeight: 700,
-            }}
+            style={{ fontFamily: "var(--font-playfair)", color: "#1A1A1A", fontWeight: 700 }}
           >
             Edit Decision
           </h1>
@@ -149,51 +148,19 @@ export default async function EditDecisionPage({ params }: PageProps) {
 
         <form action={updateDecisionWithId}>
           <Field label="Project">
-            <input
-              id="project"
-              name="project"
-              type="text"
-              defaultValue={d.project}
-              required
-              className={inputClass}
-              style={inputStyle}
-            />
+            <input id="project" name="project" type="text" defaultValue={d.project} required className={inputClass} style={inputStyle} />
           </Field>
 
           <Field label="Decision">
-            <textarea
-              id="decision"
-              name="decision"
-              rows={3}
-              defaultValue={d.decision}
-              required
-              className={inputClass}
-              style={inputStyle}
-            />
+            <textarea id="decision" name="decision" rows={3} defaultValue={d.decision} required className={inputClass} style={inputStyle} />
           </Field>
 
           <Field label="Context">
-            <textarea
-              id="context"
-              name="context"
-              rows={5}
-              defaultValue={d.context}
-              required
-              className={inputClass}
-              style={inputStyle}
-            />
+            <textarea id="context" name="context" rows={5} defaultValue={d.context} required className={inputClass} style={inputStyle} />
           </Field>
 
           <Field label="Reasoning">
-            <textarea
-              id="reasoning"
-              name="reasoning"
-              rows={5}
-              defaultValue={d.reasoning}
-              required
-              className={inputClass}
-              style={inputStyle}
-            />
+            <textarea id="reasoning" name="reasoning" rows={5} defaultValue={d.reasoning} required className={inputClass} style={inputStyle} />
           </Field>
 
           <Field label="Options Considered" hint="One option per line">
@@ -209,14 +176,7 @@ export default async function EditDecisionPage({ params }: PageProps) {
           </Field>
 
           <Field label="Trade-offs">
-            <textarea
-              id="trade_offs"
-              name="trade_offs"
-              rows={3}
-              defaultValue={d.trade_offs ?? ""}
-              className={inputClass}
-              style={inputStyle}
-            />
+            <textarea id="trade_offs" name="trade_offs" rows={3} defaultValue={d.trade_offs ?? ""} className={inputClass} style={inputStyle} />
           </Field>
 
           <Field label="Tags" hint="One tag per line">
@@ -231,25 +191,11 @@ export default async function EditDecisionPage({ params }: PageProps) {
             />
           </Field>
 
-          {/* Outcome — close the loop */}
-          <div
-            className="mt-2 p-8 border"
-            style={{ borderColor: "#8C7B6B", backgroundColor: "#FAFAF8" }}
-          >
+          <div className="mt-2 p-8 border" style={{ borderColor: "#8C7B6B", backgroundColor: "#FAFAF8" }}>
             <div className="mb-5">
               <div className="flex items-baseline justify-between mb-1">
-                <p
-                  className="text-xs tracking-[0.2em] uppercase"
-                  style={{ color: "#8C7B6B" }}
-                >
-                  Outcome
-                </p>
-                <span
-                  className="text-[10px] tracking-wider uppercase"
-                  style={{ color: "#8C7B6B" }}
-                >
-                  Close the loop
-                </span>
+                <p className="text-xs tracking-[0.2em] uppercase" style={{ color: "#8C7B6B" }}>Outcome</p>
+                <span className="text-[10px] tracking-wider uppercase" style={{ color: "#8C7B6B" }}>Close the loop</span>
               </div>
               <p className="text-xs" style={{ color: "#C4B9AE" }}>
                 What actually happened? Recording the outcome completes this decision record.
@@ -271,7 +217,6 @@ export default async function EditDecisionPage({ params }: PageProps) {
             )}
           </div>
 
-          {/* Actions */}
           <div className="mt-12 flex items-center justify-between">
             <Link
               href={`/decisions/${id}`}
@@ -289,7 +234,6 @@ export default async function EditDecisionPage({ params }: PageProps) {
             </button>
           </div>
         </form>
-
       </div>
     </main>
   );
