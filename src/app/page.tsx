@@ -48,7 +48,8 @@ async function getDecisions(
       .then((res) => {
         // Apply tag filter client-side on rpc results if needed
         if (tag && res.data) {
-          return { ...res, data: res.data.filter((d: Decision) => d.tags?.includes(tag)) };
+          const dataArray = Array.isArray(res.data) ? res.data : [res.data];
+          return { ...res, data: dataArray.filter((d: Decision) => d.tags?.includes(tag)) };
         }
         return res;
       });
