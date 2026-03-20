@@ -5,6 +5,10 @@ import { redirect } from "next/navigation";
 async function createDecision(formData: FormData) {
   "use server";
 
+  const { auth } = await import('@clerk/nextjs/server')
+  const { userId } = await auth()
+  if (!userId) throw new Error('Not authenticated')
+
   const raw = (key: string) => (formData.get(key) as string | null) ?? "";
   const splitLines = (key: string): string[] =>
     raw(key)
@@ -15,6 +19,7 @@ async function createDecision(formData: FormData) {
   const { data, error } = await supabase
     .from("decisions")
     .insert({
+      user_id: userId,
       project: raw("project"),
       context: raw("context"),
       decision: raw("decision"),
