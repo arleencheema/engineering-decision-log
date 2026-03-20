@@ -93,117 +93,196 @@ export default async function HomePage({ searchParams }: PageProps) {
   const hasFilters = !!q || !!tag;
 
   return (
-    <main
-      className="min-h-screen"
-      style={{ backgroundColor: "#F5F0E8", fontFamily: "var(--font-inter)" }}
-    >
-      <div className="max-w-4xl mx-auto px-6 py-16 md:py-24">
-        <header className="mb-16 md:mb-20">
-          <div className="flex items-end justify-between border-b pb-8" style={{ borderColor: "#D6CFC4" }}>
+    <main className="min-h-screen" style={{ backgroundColor: "#F5F0E8" }}>
+
+      {/* Editorial masthead */}
+      <div style={{ borderBottom: "3px solid #1A1A1A" }}>
+        <div className="max-w-5xl mx-auto px-6 py-10">
+          <div className="flex items-start justify-between gap-8">
             <div>
-              <p className="text-xs tracking-[0.2em] uppercase mb-3" style={{ color: "#8C7B6B" }}>
-                Engineering
-              </p>
+              <div className="flex items-center gap-6 mb-4">
+                <span
+                  className="text-[10px] tracking-[0.3em] uppercase"
+                  style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
+                >
+                  Engineering
+                </span>
+                <span style={{ color: "#D6CFC4", fontSize: "10px" }}>—</span>
+                <span
+                  className="text-[10px] tracking-[0.3em] uppercase"
+                  style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
+                >
+                  {decisions.length} {decisions.length === 1 ? "Record" : "Records"}
+                  {hasFilters ? " Found" : ""}
+                </span>
+              </div>
               <h1
-                className="text-5xl md:text-6xl leading-none"
-                style={{ fontFamily: "var(--font-playfair)", color: "#1A1A1A", fontWeight: 700 }}
+                className="text-6xl md:text-8xl leading-none tracking-tight"
+                style={{
+                  fontFamily: "var(--font-playfair)",
+                  color: "#1A1A1A",
+                  fontWeight: 900,
+                  letterSpacing: "-0.02em",
+                }}
               >
-                Decision Log
+                Decision
+                <br />
+                Log
               </h1>
             </div>
-            <div className="flex items-center gap-4 pb-1">
-              <span className="text-sm" style={{ color: "#8C7B6B" }}>
-                {decisions.length} {decisions.length === 1 ? "record" : "records"}
-                {hasFilters ? " found" : ""}
-              </span>
+            <div className="flex flex-col items-end justify-between h-full gap-6 pt-1">
               <Link
                 href="/decisions/new"
-                className="px-5 py-2.5 text-sm border transition-all duration-200 hover:bg-[#1A1A1A] hover:text-[#FAFAF8] hover:border-[#1A1A1A]"
-                style={{ borderColor: "#1A1A1A", color: "#1A1A1A" }}
+                className="px-6 py-3 text-xs tracking-[0.15em] uppercase border-2 transition-all duration-200 hover:bg-[#1A1A1A] hover:text-[#FAFAF8]"
+                style={{
+                  borderColor: "#1A1A1A",
+                  color: "#1A1A1A",
+                  fontFamily: "var(--font-inter)",
+                }}
               >
-                New Decision
+                + New Entry
               </Link>
+              <p
+                className="text-xs text-right leading-relaxed max-w-[180px]"
+                style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
+              >
+                A personal record of architectural decisions and their outcomes.
+              </p>
             </div>
           </div>
-        </header>
+        </div>
+      </div>
 
-        <section className="mb-12">
+      <div className="max-w-5xl mx-auto px-6">
+
+        {/* Search + filters */}
+        <div
+          className="py-6"
+          style={{ borderBottom: "1px solid #D6CFC4" }}
+        >
           <Suspense fallback={null}>
             <SearchControls allTags={allTags} currentQuery={q} currentTag={tag} />
           </Suspense>
-        </section>
+        </div>
 
+        {/* Error */}
         {error && (
           <div
-            className="border p-5 text-sm mb-8"
+            className="border p-5 text-sm my-8"
             style={{ borderColor: "#C9A9A6", backgroundColor: "#F9EFEE", color: "#8B3A3A" }}
           >
             {error}
           </div>
         )}
 
+        {/* Empty state */}
         {!error && decisions.length === 0 && (
-          <div className="py-24 text-center">
-            <p className="text-xl mb-4" style={{ fontFamily: "var(--font-playfair)", color: "#8C7B6B" }}>
-              {hasFilters ? "No decisions match your filters." : "No decisions yet."}
+          <div className="py-32 text-center">
+            <p
+              className="text-3xl mb-6"
+              style={{ fontFamily: "var(--font-playfair)", color: "#C4B9AE", fontWeight: 700 }}
+            >
+              {hasFilters ? "No matching records." : "Nothing logged yet."}
+            </p>
+            <p className="text-sm mb-8" style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}>
+              {hasFilters ? "Try adjusting your filters." : "Start documenting your thinking."}
             </p>
             {hasFilters ? (
-              <Link href="/" className="text-sm underline underline-offset-4" style={{ color: "#8C7B6B" }}>
+              <Link href="/" className="text-xs tracking-[0.15em] uppercase underline underline-offset-4" style={{ color: "#8C7B6B" }}>
                 Clear filters
               </Link>
             ) : (
-              <Link href="/decisions/new" className="text-sm underline underline-offset-4" style={{ color: "#8C7B6B" }}>
-                Record your first decision
+              <Link
+                href="/decisions/new"
+                className="px-6 py-3 text-xs tracking-[0.15em] uppercase border-2 transition-all duration-200 hover:bg-[#1A1A1A] hover:text-[#FAFAF8]"
+                style={{ borderColor: "#1A1A1A", color: "#1A1A1A", fontFamily: "var(--font-inter)" }}
+              >
+                + New Entry
               </Link>
             )}
           </div>
         )}
 
-        <ul className="divide-y" style={{ borderColor: "#D6CFC4" }}>
+        {/* Decision list */}
+        <ul>
           {decisions.map((d, i) => (
-            <li key={d.id}>
+            <li
+              key={d.id}
+              style={{ borderBottom: "1px solid #D6CFC4" }}
+            >
               <Link
                 href={`/decisions/${d.id}`}
-                className="group flex flex-col md:flex-row md:items-start gap-4 md:gap-8 py-8 transition-all duration-200"
+                className="group grid py-10 transition-all duration-200"
+                style={{ gridTemplateColumns: "4rem 1fr auto" }}
               >
-                <span
-                  className="hidden md:block text-xs pt-1 w-8 shrink-0 tabular-nums"
-                  style={{ color: "#C4B9AE" }}
-                >
-                  {String(decisions.length - i).padStart(2, "0")}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-baseline gap-3 mb-2">
-                    <span className="text-xs tracking-[0.15em] uppercase" style={{ color: "#8C7B6B" }}>
+                {/* Large index number */}
+                <div className="pt-1">
+                  <span
+                    className="text-4xl font-bold leading-none tabular-nums"
+                    style={{
+                      fontFamily: "var(--font-playfair)",
+                      color: "#EDE8E0",
+                      fontWeight: 900,
+                    }}
+                  >
+                    {String(decisions.length - i).padStart(2, "0")}
+                  </span>
+                </div>
+
+                {/* Main content */}
+                <div className="pr-8">
+                  {/* Meta row */}
+                  <div className="flex flex-wrap items-center gap-3 mb-3">
+                    <span
+                      className="text-[10px] tracking-[0.25em] uppercase font-semibold"
+                      style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
+                    >
                       {d.project}
                     </span>
-                    <span className="text-xs" style={{ color: "#C4B9AE" }}>
+                    <span style={{ color: "#D6CFC4", fontSize: "10px" }}>·</span>
+                    <span
+                      className="text-[11px]"
+                      style={{ color: "#C4B9AE", fontFamily: "var(--font-inter)" }}
+                    >
                       {formatDate(d.created_at)}
                     </span>
                     {d.outcome && (
                       <span
-                        className="text-[10px] tracking-wider uppercase px-2 py-0.5 border"
-                        style={{ borderColor: "#8C7B6B", color: "#8C7B6B" }}
+                        className="text-[9px] tracking-[0.2em] uppercase px-2 py-0.5 font-semibold"
+                        style={{
+                          backgroundColor: "#8C7B6B",
+                          color: "#FAFAF8",
+                          fontFamily: "var(--font-inter)",
+                        }}
                       >
                         Resolved
                       </span>
                     )}
                   </div>
+
+                  {/* Decision title */}
                   <p
-                    className="text-lg leading-snug mb-3 group-hover:opacity-70 transition-opacity duration-200"
-                    style={{ color: "#1A1A1A" }}
+                    className="text-2xl md:text-3xl leading-tight mb-4 group-hover:opacity-60 transition-opacity duration-200"
+                    style={{
+                      fontFamily: "var(--font-playfair)",
+                      color: "#1A1A1A",
+                      fontWeight: 700,
+                    }}
                   >
                     {d.decision}
                   </p>
+
+                  {/* Tags */}
                   {d.tags && d.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {d.tags.map((t) => (
                         <span
                           key={t}
-                          className="text-[11px] tracking-wide px-2 py-0.5"
+                          className="text-[10px] tracking-[0.15em] uppercase px-3 py-1"
                           style={{
-                            backgroundColor: t === tag ? "#8C7B6B" : "#EDE8E0",
+                            backgroundColor: t === tag ? "#1A1A1A" : "#EDE8E0",
                             color: t === tag ? "#FAFAF8" : "#8C7B6B",
+                            fontFamily: "var(--font-inter)",
                           }}
                         >
                           {t}
@@ -212,12 +291,16 @@ export default async function HomePage({ searchParams }: PageProps) {
                     </div>
                   )}
                 </div>
-                <span
-                  className="hidden md:block text-sm pt-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                  style={{ color: "#8C7B6B" }}
-                >
-                  →
-                </span>
+
+                {/* Arrow */}
+                <div className="flex items-center">
+                  <span
+                    className="text-xl opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:translate-x-1"
+                    style={{ color: "#8C7B6B" }}
+                  >
+                    →
+                  </span>
+                </div>
               </Link>
             </li>
           ))}

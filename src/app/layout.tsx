@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
-import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
+import { ClerkProvider, Show, UserButton, SignInButton } from "@clerk/nextjs";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -32,22 +32,44 @@ export default function RootLayout({
           style={{ backgroundColor: "#F5F0E8", color: "#1A1A1A" }}
           className="font-sans antialiased"
         >
-          <header style={{ borderBottom: "1px solid #D9D0C1", padding: "1rem 1.5rem" }}>
-            <div style={{ maxWidth: "48rem", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontFamily: "var(--font-playfair)", fontSize: "1.25rem", fontWeight: 700, color: "#1A1A1A" }}>
-                Decision Log
+          <nav
+            style={{
+              borderBottom: "1px solid #D9D0C1",
+              padding: "0.75rem 1.5rem",
+              backgroundColor: "#F5F0E8",
+            }}
+          >
+            <div
+              style={{
+                maxWidth: "80rem",
+                margin: "0 auto",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-inter)",
+                  fontSize: "0.65rem",
+                  fontWeight: 600,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "#8C7B6B",
+                }}
+              >
+                Engineering Decision Log
               </span>
               <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                 <Show when="signed-out">
                   <SignInButton />
-                  <SignUpButton />
                 </Show>
                 <Show when="signed-in">
                   <UserButton />
                 </Show>
               </div>
             </div>
-          </header>
+          </nav>
           {children}
         </body>
       </html>
