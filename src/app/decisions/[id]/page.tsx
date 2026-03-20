@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 interface Decision {
   id: string;
@@ -18,6 +18,22 @@ interface Decision {
 
 interface PageProps {
   params: Promise<{ id: string }>;
+}
+
+async function deleteDecision(id: string) {
+  "use server";
+  const { auth } = await import('@clerk/nextjs/server')
+  const { userId } = await auth()
+  if (!userId) throw new Error('Not authenticated')
+
+  const { error } = await supabase
+    .from("decisions")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
+
+  if (error) throw new Error(error.message);
+  redirect("/");
 }
 
 function formatDate(ts: string) {
@@ -75,6 +91,7 @@ export default async function DecisionDetailPage({ params }: PageProps) {
   if (error || !data) notFound();
 
   const decision = data as Decision;
+  const deleteDecisionWithId = deleteDecision.bind(null, decision.id);
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#F5F0E8" }}>
@@ -202,7 +219,6 @@ export default async function DecisionDetailPage({ params }: PageProps) {
             <Section number="04" label="Trade-offs">{decision.trade_offs}</Section>
           )}
 
-          {/* Outcome */}
           {decision.outcome ? (
             <div
               className="mt-12 p-8 border-2"
@@ -241,10 +257,7 @@ export default async function DecisionDetailPage({ params }: PageProps) {
                 >
                   Outcome
                 </p>
-                <p
-                  className="text-sm"
-                  style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
-                >
+                <p className="text-sm" style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}>
                   Not yet recorded — this decision is still open.
                 </p>
               </div>
@@ -269,13 +282,29 @@ export default async function DecisionDetailPage({ params }: PageProps) {
           >
             {decision.id}
           </span>
-          <Link
-            href="/"
-            className="text-[10px] tracking-[0.2em] uppercase transition-opacity duration-200 hover:opacity-60"
-            style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
-          >
-            ← All Decisions
-          </Link>
+          <div className="flex items-center gap-6">
+            <form action={deleteDecisionWithId}>
+              <button
+                type="submit"
+                className="text-[10px] tracking-[0.2em] uppercase transition-opacity duration-200 hover:opacity-60"
+                style={{ color: "#C4B9AE", fontFamily: "var(--font-inter)" }}
+                onClick={(e) => {
+                  if (!confirm("Delete this decision? This cannot be undone.")) {
+                    e.preventDefault();
+                  }
+                }}
+              >
+                Delete
+              </button>
+            </form>
+            <Link
+              href="/"
+              className="text-[10px] tracking-[0.2em] uppercase transition-opacity duration-200 hover:opacity-60"
+              style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
+            >
+              ← All Decisions
+            </Link>
+          </div>
         </footer>
       </div>
     </main>
