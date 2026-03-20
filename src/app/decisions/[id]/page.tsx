@@ -1,7 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import DeleteButton from "./DeleteButton";
 
 interface Decision {
   id: string;
@@ -18,22 +19,6 @@ interface Decision {
 
 interface PageProps {
   params: Promise<{ id: string }>;
-}
-
-async function deleteDecision(id: string) {
-  "use server";
-  const { auth } = await import('@clerk/nextjs/server')
-  const { userId } = await auth()
-  if (!userId) throw new Error('Not authenticated')
-
-  const { error } = await supabase
-    .from("decisions")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", userId);
-
-  if (error) throw new Error(error.message);
-  redirect("/");
 }
 
 function formatDate(ts: string) {
@@ -91,7 +76,6 @@ export default async function DecisionDetailPage({ params }: PageProps) {
   if (error || !data) notFound();
 
   const decision = data as Decision;
-  const deleteDecisionWithId = deleteDecision.bind(null, decision.id);
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: "#F5F0E8" }}>
@@ -283,20 +267,7 @@ export default async function DecisionDetailPage({ params }: PageProps) {
             {decision.id}
           </span>
           <div className="flex items-center gap-6">
-            <form action={deleteDecisionWithId}>
-              <button
-                type="submit"
-                className="text-[10px] tracking-[0.2em] uppercase transition-opacity duration-200 hover:opacity-60"
-                style={{ color: "#C4B9AE", fontFamily: "var(--font-inter)" }}
-                onClick={(e) => {
-                  if (!confirm("Delete this decision? This cannot be undone.")) {
-                    e.preventDefault();
-                  }
-                }}
-              >
-                Delete
-              </button>
-            </form>
+            <DeleteButton id={decision.id} />
             <Link
               href="/"
               className="text-[10px] tracking-[0.2em] uppercase transition-opacity duration-200 hover:opacity-60"
