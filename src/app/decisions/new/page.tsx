@@ -48,76 +48,101 @@ const inputStyle = {
 function Field({
   label,
   hint,
+  number,
   children,
 }: {
   label: string;
   hint?: string;
+  number: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="py-7 border-b" style={{ borderColor: "#D6CFC4" }}>
-      <div className="mb-3">
-        <p
-          className="text-xs tracking-[0.2em] uppercase"
-          style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
+    <div
+      className="grid py-8 border-b"
+      style={{
+        gridTemplateColumns: "3rem 1fr",
+        gap: "1.5rem",
+        borderColor: "#D6CFC4",
+      }}
+    >
+      <div className="pt-0.5">
+        <span
+          className="text-2xl font-bold leading-none"
+          style={{
+            fontFamily: "var(--font-playfair)",
+            color: "#EDE8E0",
+            fontWeight: 900,
+          }}
         >
-          {label}
-        </p>
-        {hint && (
-          <p className="text-xs mt-1" style={{ color: "#C4B9AE", fontFamily: "var(--font-inter)" }}>
-            {hint}
-          </p>
-        )}
+          {number}
+        </span>
       </div>
-      {children}
+      <div>
+        <div className="mb-3">
+          <p
+            className="text-[10px] tracking-[0.25em] uppercase font-semibold"
+            style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
+          >
+            {label}
+          </p>
+          {hint && (
+            <p className="text-xs mt-1" style={{ color: "#C4B9AE", fontFamily: "var(--font-inter)" }}>
+              {hint}
+            </p>
+          )}
+        </div>
+        {children}
+      </div>
     </div>
   );
 }
 
 export default function NewDecisionPage() {
   return (
-    <main
-      className="min-h-screen"
-      style={{ backgroundColor: "#F5F0E8", fontFamily: "var(--font-inter)" }}
-    >
-      <div className="max-w-3xl mx-auto px-6 py-16 md:py-24">
+    <main className="min-h-screen" style={{ backgroundColor: "#F5F0E8" }}>
 
-        {/* Nav */}
-        <nav className="flex items-center justify-between mb-16">
-          <Link
-            href="/"
-            className="text-sm flex items-center gap-2 transition-opacity duration-200 hover:opacity-60"
-            style={{ color: "#8C7B6B" }}
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Decision Log
-          </Link>
-        </nav>
+      {/* Masthead */}
+      <div style={{ borderBottom: "3px solid #1A1A1A" }}>
+        <div className="max-w-3xl mx-auto px-6 py-10">
+          <div className="flex items-start justify-between">
+            <div>
+              <p
+                className="text-[10px] tracking-[0.3em] uppercase mb-4"
+                style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
+              >
+                New Record
+              </p>
+              <h1
+                className="text-5xl md:text-6xl leading-none tracking-tight"
+                style={{
+                  fontFamily: "var(--font-playfair)",
+                  color: "#1A1A1A",
+                  fontWeight: 900,
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                Record a
+                <br />
+                Decision
+              </h1>
+            </div>
+            <Link
+              href="/"
+              className="text-[10px] tracking-[0.2em] uppercase flex items-center gap-2 transition-opacity duration-200 hover:opacity-60 pt-1"
+              style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
+            >
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              All Decisions
+            </Link>
+          </div>
+        </div>
+      </div>
 
-        {/* Page title */}
-        <header className="mb-12 pb-12 border-b" style={{ borderColor: "#D6CFC4" }}>
-          <p
-            className="text-xs tracking-[0.2em] uppercase mb-3"
-            style={{ color: "#8C7B6B" }}
-          >
-            New Record
-          </p>
-          <h1
-            className="text-4xl md:text-5xl leading-tight"
-            style={{
-              fontFamily: "var(--font-playfair)",
-              color: "#1A1A1A",
-              fontWeight: 700,
-            }}
-          >
-            Record a Decision
-          </h1>
-        </header>
-
+      <div className="max-w-3xl mx-auto px-6 pb-24">
         <form action={createDecision}>
-          <Field label="Project">
+          <Field number="01" label="Project">
             <input
               id="project"
               name="project"
@@ -129,7 +154,7 @@ export default function NewDecisionPage() {
             />
           </Field>
 
-          <Field label="Decision" hint="State the decision clearly and directly.">
+          <Field number="02" label="Decision" hint="State the decision clearly and directly.">
             <textarea
               id="decision"
               name="decision"
@@ -141,7 +166,7 @@ export default function NewDecisionPage() {
             />
           </Field>
 
-          <Field label="Context" hint="What circumstances led to this decision?">
+          <Field number="03" label="Context" hint="What circumstances led to this decision?">
             <textarea
               id="context"
               name="context"
@@ -152,7 +177,7 @@ export default function NewDecisionPage() {
             />
           </Field>
 
-          <Field label="Reasoning" hint="Why this option over the alternatives?">
+          <Field number="04" label="Reasoning" hint="Why this option over the alternatives?">
             <textarea
               id="reasoning"
               name="reasoning"
@@ -163,7 +188,7 @@ export default function NewDecisionPage() {
             />
           </Field>
 
-          <Field label="Options Considered" hint="One option per line">
+          <Field number="05" label="Options Considered" hint="One option per line">
             <textarea
               id="options_considered"
               name="options_considered"
@@ -174,7 +199,7 @@ export default function NewDecisionPage() {
             />
           </Field>
 
-          <Field label="Trade-offs" hint="What are the known downsides or risks?">
+          <Field number="06" label="Trade-offs" hint="What are the known downsides or risks?">
             <textarea
               id="trade_offs"
               name="trade_offs"
@@ -184,7 +209,7 @@ export default function NewDecisionPage() {
             />
           </Field>
 
-          <Field label="Tags" hint="One tag per line">
+          <Field number="07" label="Tags" hint="One tag per line">
             <textarea
               id="tags"
               name="tags"
@@ -195,7 +220,7 @@ export default function NewDecisionPage() {
             />
           </Field>
 
-          <Field label="Outcome" hint="Optional — fill this in later once the result is known.">
+          <Field number="08" label="Outcome" hint="Optional — fill this in later once the result is known.">
             <textarea
               id="outcome"
               name="outcome"
@@ -207,24 +232,30 @@ export default function NewDecisionPage() {
           </Field>
 
           {/* Actions */}
-          <div className="mt-12 flex items-center justify-between">
+          <div
+            className="flex items-center justify-between pt-10 mt-4"
+            style={{ borderTop: "1px solid #D6CFC4" }}
+          >
             <Link
               href="/"
-              className="text-sm transition-opacity duration-200 hover:opacity-60"
-              style={{ color: "#8C7B6B" }}
+              className="text-[10px] tracking-[0.2em] uppercase transition-opacity duration-200 hover:opacity-60"
+              style={{ color: "#8C7B6B", fontFamily: "var(--font-inter)" }}
             >
               Cancel
             </Link>
             <button
               type="submit"
-              className="px-8 py-3 text-sm border transition-all duration-200 hover:bg-[#1A1A1A] hover:text-[#FAFAF8] hover:border-[#1A1A1A]"
-              style={{ borderColor: "#1A1A1A", color: "#1A1A1A" }}
+              className="px-8 py-3 text-[10px] tracking-[0.2em] uppercase border-2 font-semibold transition-all duration-200 hover:bg-[#1A1A1A] hover:text-[#FAFAF8]"
+              style={{
+                borderColor: "#1A1A1A",
+                color: "#1A1A1A",
+                fontFamily: "var(--font-inter)",
+              }}
             >
-              Save Decision
+              Save Decision →
             </button>
           </div>
         </form>
-
       </div>
     </main>
   );
